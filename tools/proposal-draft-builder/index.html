@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proposal Draft Builder</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8fa;
+      --panel: #ffffff;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d9dee7;
+      --accent: #2563eb;
+      --accent-ink: #ffffff;
+      --soft: #eef4ff;
+      --shadow: 0 14px 32px rgba(24, 34, 48, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    main {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    header {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(340px, 1.05fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 14px;
+      color: #344054;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: var(--ink);
+      background: #fff;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    textarea.large {
+      min-height: 132px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: var(--accent-ink);
+      background: var(--accent);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      color: var(--ink);
+      background: #eef2f7;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .badge {
+      display: inline-flex;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: var(--soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    pre {
+      min-height: 560px;
+      max-height: 720px;
+      overflow: auto;
+      margin: 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #101828;
+      color: #eef2ff;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      pre {
+        min-height: 380px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <span class="badge">Proposal Draft Builder</span>
+      <h1>応募文の下書きをすばやく作る</h1>
+      <p>Opportunity Scorecard で応募と判断した案件を、クラウドワークス等へ貼りやすい Markdown 応募文に変換する。</p>
+    </header>
+
+    <div class="layout">
+      <section aria-labelledby="input-title">
+        <h2 id="input-title">入力</h2>
+        <div id="fields"></div>
+        <div class="actions">
+          <button id="copy">Markdown をコピー</button>
+          <button id="reset" class="secondary">初期値に戻す</button>
+          <span class="hint">送信前に、報酬・納期・相手の募集条件だけ最終確認してください。</span>
+        </div>
+      </section>
+
+      <section aria-labelledby="output-title">
+        <h2 id="output-title">出力</h2>
+        <pre id="output"></pre>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const fields = [
+      {
+        id: "projectName",
+        label: "案件名",
+        type: "input",
+        value: "小規模事業者向け LP 改善"
+      },
+      {
+        id: "jobDescription",
+        label: "募集内容",
+        type: "textarea large",
+        value: "既存のランディングページを見直し、問い合わせ率を上げるための改善提案をしてほしい。構成、文章、導線の改善案が必要。"
+      },
+      {
+        id: "strengths",
+        label: "自分の強み",
+        type: "textarea",
+        value: "目的整理から構成案、文章改善、実装しやすい形への落とし込みまで一貫して対応できます。見る人が迷わず次の行動に進める導線づくりを意識しています。"
+      },
+      {
+        id: "results",
+        label: "アピールしたい実績",
+        type: "textarea",
+        value: "業務改善ツールや提案資料の作成を通じて、情報を分かりやすく整理し、実務で使える形にする制作を行ってきました。"
+      },
+      {
+        id: "notes",
+        label: "備考",
+        type: "textarea",
+        value: "まずは現状ページを確認し、改善ポイントを優先度つきで整理します。そのうえで、構成案と修正文案を提出します。"
+      }
+    ];
+
+    const fieldsEl = document.querySelector("#fields");
+    const outputEl = document.querySelector("#output");
+
+    function createFields() {
+      fieldsEl.innerHTML = fields.map((field) => {
+        const control = field.type === "input"
+          ? `<input id="${field.id}" value="${escapeHtml(field.value)}" autocomplete="off">`
+          : `<textarea id="${field.id}" class="${field.type.includes("large") ? "large" : ""}">${escapeHtml(field.value)}</textarea>`;
+
+        return `
+          <label>
+            ${field.label}
+            ${control}
+          </label>
+        `;
+      }).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function valueOf(id) {
+      return document.querySelector(`#${id}`).value.trim();
+    }
+
+    function buildProposal() {
+      const projectName = valueOf("projectName") || "ご依頼案件";
+      const jobDescription = valueOf("jobDescription") || "募集内容を確認しました。";
+      const strengths = valueOf("strengths") || "目的に合わせて丁寧に対応します。";
+      const results = valueOf("results") || "関連する制作経験を活かして対応します。";
+      const notes = valueOf("notes") || "まずは詳細を確認し、進め方をご提案します。";
+
+      return `# ${projectName}への応募文
+
+はじめまして。
+「${projectName}」の募集内容を拝見し、応募いたします。
+
+## 募集内容の理解
+
+${jobDescription}
+
+今回の案件では、目的に合わせて必要な情報を整理し、実務で使いやすい形に落とし込むことが重要だと考えています。
+
+## 私の強み
+
+${strengths}
+
+## アピールできる実績
+
+${results}
+
+## 進め方
+
+${notes}
+
+まずは現状や希望条件を確認したうえで、優先度の高い部分から進めます。
+必要に応じて、作業範囲・納期・確認ポイントを整理して共有します。
+
+どうぞよろしくお願いいたします。`;
+    }
+
+    function update() {
+      outputEl.textContent = buildProposal();
+    }
+
+    function resetForm() {
+      for (const field of fields) {
+        document.querySelector(`#${field.id}`).value = field.value;
+      }
+      update();
+    }
+
+    async function copyMarkdown() {
+      const text = outputEl.textContent;
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const buffer = document.createElement("textarea");
+        buffer.value = text;
+        buffer.setAttribute("readonly", "");
+        buffer.style.position = "fixed";
+        buffer.style.opacity = "0";
+        document.body.appendChild(buffer);
+        buffer.select();
+        document.execCommand("copy");
+        document.body.removeChild(buffer);
+      }
+      document.querySelector("#copy").textContent = "コピーしました";
+      setTimeout(() => {
+        document.querySelector("#copy").textContent = "Markdown をコピー";
+      }, 1200);
+    }
+
+    createFields();
+    document.addEventListener("input", update);
+    document.querySelector("#copy").addEventListener("click", copyMarkdown);
+    document.querySelector("#reset").addEventListener("click", resetForm);
+    update();
+  </script>
+</body>
+</html>

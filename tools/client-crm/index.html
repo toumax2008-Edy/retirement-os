@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Client CRM</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d9dee7;
+      --accent: #0f766e;
+      --accent-ink: #ffffff;
+      --soft: #e6f4f1;
+      --warn: #b45309;
+      --shadow: 0 14px 32px rgba(24, 34, 48, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    main {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    header {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(340px, 0.8fr) minmax(0, 1.2fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+      color: #344054;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: var(--ink);
+      background: #fff;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: var(--accent-ink);
+      background: var(--accent);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      color: var(--ink);
+      background: #eef2f7;
+    }
+
+    .badge {
+      display: inline-flex;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: var(--soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 900px;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 13px;
+    }
+
+    th {
+      color: #344054;
+      background: #f8fafc;
+      font-weight: 800;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    td select {
+      min-width: 96px;
+      padding: 7px 8px;
+      font-size: 13px;
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .summary span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #fff;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    pre {
+      min-height: 360px;
+      max-height: 560px;
+      overflow: auto;
+      margin: 14px 0 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #101828;
+      color: #eef2ff;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 960px) {
+      .layout,
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <span class="badge">Client CRM</span>
+      <h1>応募・受注案件を見失わない</h1>
+      <p>応募中、面談、契約、作業中、納品、継続、終了までを1画面で管理し、Markdownで記録する。</p>
+    </header>
+
+    <div class="layout">
+      <section aria-labelledby="input-title">
+        <h2 id="input-title">案件を追加</h2>
+
+        <label>
+          クライアント名
+          <input id="clientName" value="サンプル制作会社" autocomplete="off">
+        </label>
+
+        <label>
+          案件名
+          <input id="projectName" value="LP改善提案" autocomplete="off">
+        </label>
+
+        <div class="field-grid">
+          <label>
+            案件種別
+            <select id="projectType">
+              <option>受託</option>
+              <option>ポートフォリオ</option>
+              <option>自社事業</option>
+              <option>継続案件</option>
+            </select>
+          </label>
+
+          <label>
+            応募日
+            <input id="appliedDate" type="date">
+          </label>
+        </div>
+
+        <div class="field-grid">
+          <label>
+            ステータス
+            <select id="status"></select>
+          </label>
+
+          <label>
+            報酬
+            <input id="reward" value="50,000円" autocomplete="off">
+          </label>
+        </div>
+
+        <label>
+          次にやること
+          <textarea id="nextAction">募集文を再確認して応募文を調整</textarea>
+        </label>
+
+        <label>
+          メモ
+          <textarea id="memo">サンプルデータ。実名や契約情報は公開前に伏せる。</textarea>
+        </label>
+
+        <div class="actions">
+          <button id="addDeal">案件を追加</button>
+          <button id="resetSamples" class="secondary">サンプルに戻す</button>
+          <span class="hint">ブラウザ内に自動保存します。共有用の記録は Markdown をコピーしてください。</span>
+        </div>
+      </section>
+
+      <section aria-labelledby="list-title">
+        <h2 id="list-title">案件一覧</h2>
+        <div class="summary" id="summary"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>クライアント</th>
+                <th>案件名</th>
+                <th>種別</th>
+                <th>応募日</th>
+                <th>ステータス</th>
+                <th>報酬</th>
+                <th>次にやること</th>
+                <th>メモ</th>
+              </tr>
+            </thead>
+            <tbody id="dealRows"></tbody>
+          </table>
+        </div>
+        <div class="actions">
+          <button id="copyMarkdown">Markdown をコピー</button>
+        </div>
+        <pre id="markdown"></pre>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const statuses = ["応募中", "面談", "契約", "作業中", "納品", "継続", "終了"];
+
+    const sampleDeals = [
+      {
+        clientName: "サンプル制作会社",
+        projectName: "LP改善提案",
+        projectType: "受託",
+        appliedDate: "2026-07-05",
+        status: "応募中",
+        reward: "50,000円",
+        nextAction: "募集文を再確認して応募文を調整",
+        memo: "Proposal Draft Builder で応募文を作成する。"
+      },
+      {
+        clientName: "架空EC事業者",
+        projectName: "商品ページ改善",
+        projectType: "受託",
+        appliedDate: "2026-07-04",
+        status: "面談",
+        reward: "80,000円",
+        nextAction: "面談で納品範囲を確認",
+        memo: "作業範囲と修正回数を確認する。"
+      },
+      {
+        clientName: "自社実験",
+        projectName: "引退OSツール整理",
+        projectType: "自社事業",
+        appliedDate: "2026-07-03",
+        status: "作業中",
+        reward: "-",
+        nextAction: "READMEとshowcaseを更新",
+        memo: "公開前に個人情報がないか確認する。"
+      }
+    ];
+
+    const fields = ["clientName", "projectName", "projectType", "appliedDate", "status", "reward", "nextAction", "memo"];
+    const storageKey = "retirement-os-client-crm";
+    function loadDeals() {
+      try {
+        const saved = localStorage.getItem(storageKey);
+        return saved ? JSON.parse(saved) : sampleDeals.map((deal) => ({ ...deal }));
+      } catch (error) {
+        return sampleDeals.map((deal) => ({ ...deal }));
+      }
+    }
+
+    function saveDeals() {
+      localStorage.setItem(storageKey, JSON.stringify(deals));
+    }
+
+    let deals = loadDeals();
+
+    const statusInput = document.querySelector("#status");
+    const rowsEl = document.querySelector("#dealRows");
+    const summaryEl = document.querySelector("#summary");
+    const markdownEl = document.querySelector("#markdown");
+
+    function today() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function setupStatusOptions() {
+      statusInput.innerHTML = statuses.map((status) => `<option>${status}</option>`).join("");
+    }
+
+    function valueOf(id) {
+      return document.querySelector(`#${id}`).value.trim();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function addDeal() {
+      const deal = fields.reduce((acc, id) => {
+        acc[id] = valueOf(id) || "-";
+        return acc;
+      }, {});
+      deals.unshift(deal);
+      render();
+    }
+
+    function updateStatus(index, status) {
+      deals[index].status = status;
+      render();
+    }
+
+    function statusSelect(index, currentStatus) {
+      const options = statuses
+        .map((status) => `<option ${status === currentStatus ? "selected" : ""}>${status}</option>`)
+        .join("");
+      return `<select data-index="${index}" class="statusSelect">${options}</select>`;
+    }
+
+    function renderRows() {
+      rowsEl.innerHTML = deals.map((deal, index) => `
+        <tr>
+          <td>${escapeHtml(deal.clientName)}</td>
+          <td>${escapeHtml(deal.projectName)}</td>
+          <td>${escapeHtml(deal.projectType)}</td>
+          <td>${escapeHtml(deal.appliedDate)}</td>
+          <td>${statusSelect(index, deal.status)}</td>
+          <td>${escapeHtml(deal.reward)}</td>
+          <td>${escapeHtml(deal.nextAction)}</td>
+          <td>${escapeHtml(deal.memo)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderSummary() {
+      summaryEl.innerHTML = statuses
+        .map((status) => {
+          const count = deals.filter((deal) => deal.status === status).length;
+          return `<span>${status}: ${count}</span>`;
+        })
+        .join("");
+    }
+
+    function buildMarkdown() {
+      const summary = statuses
+        .map((status) => `- ${status}: ${deals.filter((deal) => deal.status === status).length}`)
+        .join("\n");
+
+      const rows = deals
+        .map((deal) => `| ${deal.clientName} | ${deal.projectName} | ${deal.projectType} | ${deal.appliedDate} | ${deal.status} | ${deal.reward} | ${deal.nextAction} |`)
+        .join("\n");
+
+      const actions = deals
+        .filter((deal) => deal.nextAction && deal.nextAction !== "-")
+        .map((deal) => `- ${deal.projectName}: ${deal.nextAction}`)
+        .join("\n") || "- なし";
+
+      const notes = deals
+        .filter((deal) => deal.memo && deal.memo !== "-")
+        .map((deal) => `- ${deal.projectName}: ${deal.memo}`)
+        .join("\n") || "- なし";
+
+      return `# Client CRM
+
+## Summary
+
+${summary}
+
+## Deals
+
+| クライアント | 案件名 | 種別 | 応募日 | ステータス | 報酬 | 次にやること |
+| --- | --- | --- | --- | --- | --- | --- |
+${rows}
+
+## Next Actions
+
+${actions}
+
+## Notes
+
+${notes}`;
+    }
+
+    function renderMarkdown() {
+      markdownEl.textContent = buildMarkdown();
+    }
+
+    function render() {
+      renderSummary();
+      renderRows();
+      renderMarkdown();
+    }
+
+    function resetSamples() {
+      deals = sampleDeals.map((deal) => ({ ...deal }));
+      saveDeals();
+      document.querySelector("#clientName").value = sampleDeals[0].clientName;
+      document.querySelector("#projectName").value = sampleDeals[0].projectName;
+      document.querySelector("#projectType").value = sampleDeals[0].projectType;
+      document.querySelector("#appliedDate").value = today();
+      document.querySelector("#status").value = sampleDeals[0].status;
+      document.querySelector("#reward").value = sampleDeals[0].reward;
+      document.querySelector("#nextAction").value = sampleDeals[0].nextAction;
+      document.querySelector("#memo").value = "サンプルデータ。実名や契約情報は公開前に伏せる。";
+      render();
+    }
+
+    async function copyMarkdown() {
+      const text = markdownEl.textContent;
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const buffer = document.createElement("textarea");
+        buffer.value = text;
+        buffer.setAttribute("readonly", "");
+        buffer.style.position = "fixed";
+        buffer.style.opacity = "0";
+        document.body.appendChild(buffer);
+        buffer.select();
+        document.execCommand("copy");
+        document.body.removeChild(buffer);
+      }
+      document.querySelector("#copyMarkdown").textContent = "コピーしました";
+      setTimeout(() => {
+        document.querySelector("#copyMarkdown").textContent = "Markdown をコピー";
+      }, 1200);
+    }
+
+    setupStatusOptions();
+    document.querySelector("#appliedDate").value = today();
+    document.querySelector("#addDeal").addEventListener("click", addDeal);
+    document.querySelector("#resetSamples").addEventListener("click", resetSamples);
+    document.querySelector("#copyMarkdown").addEventListener("click", copyMarkdown);
+    rowsEl.addEventListener("change", (event) => {
+      if (event.target.classList.contains("statusSelect")) {
+        updateStatus(Number(event.target.dataset.index), event.target.value);
+      }
+    });
+    render();
+  </script>
+</body>
+</html>
+

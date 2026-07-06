@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Work Log Builder</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d9dee7;
+      --accent: #0f766e;
+      --accent-ink: #ffffff;
+      --soft: #e6f4f1;
+      --warn: #b45309;
+      --shadow: 0 14px 32px rgba(24, 34, 48, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    main {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    header {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(340px, 0.82fr) minmax(0, 1.18fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+      color: #344054;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: var(--ink);
+      background: #fff;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 74px;
+      resize: vertical;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: var(--accent-ink);
+      background: var(--accent);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      color: var(--ink);
+      background: #eef2f7;
+    }
+
+    .badge {
+      display: inline-flex;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: var(--soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .summary span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #fff;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 13px;
+    }
+
+    th {
+      color: #344054;
+      background: #f8fafc;
+      font-weight: 800;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .candidate {
+      color: var(--warn);
+      font-weight: 800;
+    }
+
+    pre {
+      min-height: 360px;
+      max-height: 560px;
+      overflow: auto;
+      margin: 14px 0 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #101828;
+      color: #eef2ff;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 960px) {
+      .layout,
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <span class="badge">Work Log Builder</span>
+      <h1>毎日の作業を未来の実績に変える</h1>
+      <p>作業内容、成果、気づき、次アクションを短く残し、実績化候補だけ抽出する。</p>
+    </header>
+
+    <div class="layout">
+      <section aria-labelledby="input-title">
+        <h2 id="input-title">ログを追加</h2>
+
+        <div class="field-grid">
+          <label>
+            作業日
+            <input id="workDate" type="date">
+          </label>
+
+          <label>
+            作業カテゴリ
+            <select id="category"></select>
+          </label>
+        </div>
+
+        <label>
+          作業内容
+          <textarea id="workSummary">Client CRM のステータス管理と Markdown 出力を確認</textarea>
+        </label>
+
+        <div class="field-grid">
+          <label>
+            かかった時間
+            <input id="timeSpent" value="45m" autocomplete="off">
+          </label>
+
+          <label>
+            実績化候補
+            <select id="portfolioCandidate">
+              <option>はい</option>
+              <option>いいえ</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          得られた成果
+          <textarea id="result">応募・受注案件を管理する流れが作れた</textarea>
+        </label>
+
+        <label>
+          気づき
+          <textarea id="insight">ブラウザ内保存があると毎日使うツールとして現実的になる</textarea>
+        </label>
+
+        <label>
+          次にやること
+          <textarea id="nextAction">Work Log Builder から Portfolio Case Builder に移しやすい出力を整える</textarea>
+        </label>
+
+        <div class="actions">
+          <button id="addLog">ログを追加</button>
+          <button id="resetSamples" class="secondary">サンプルに戻す</button>
+          <span class="hint">ブラウザ内に自動保存します。公開前に実名や契約情報は伏せてください。</span>
+        </div>
+      </section>
+
+      <section aria-labelledby="list-title">
+        <h2 id="list-title">作業ログ</h2>
+        <div class="summary" id="summary"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>日付</th>
+                <th>カテゴリ</th>
+                <th>作業内容</th>
+                <th>時間</th>
+                <th>成果</th>
+                <th>気づき</th>
+                <th>次にやること</th>
+                <th>実績化</th>
+              </tr>
+            </thead>
+            <tbody id="logRows"></tbody>
+          </table>
+        </div>
+        <div class="actions">
+          <button id="copyAll">Markdown をコピー</button>
+          <button id="copyCandidates" class="secondary">実績化候補だけコピー</button>
+        </div>
+        <pre id="markdown"></pre>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const categories = ["案件", "自作ツール", "学習", "実験", "営業"];
+    const storageKey = "retirement-os-work-log-builder";
+
+    const sampleLogs = [
+      {
+        workDate: "2026-07-05",
+        category: "自作ツール",
+        workSummary: "Client CRM を作成",
+        timeSpent: "2h",
+        result: "応募・受注案件を管理できるようになった",
+        insight: "localStorage 保存があると毎日使いやすい",
+        nextAction: "Work Log Builder とつなげる",
+        portfolioCandidate: "はい"
+      },
+      {
+        workDate: "2026-07-05",
+        category: "営業",
+        workSummary: "応募文テンプレートを調整",
+        timeSpent: "30m",
+        result: "応募文の作成時間を短縮できた",
+        insight: "案件ごとに強みを1つに絞ると伝わりやすい",
+        nextAction: "Proposal Draft Builder の文体切替を検討",
+        portfolioCandidate: "いいえ"
+      },
+      {
+        workDate: "2026-07-04",
+        category: "実験",
+        workSummary: "Portfolio Case Builder の出力を検証",
+        timeSpent: "1h",
+        result: "実績紹介文に必要な項目が見えた",
+        insight: "課題、対応、成果の3点があれば見せやすい",
+        nextAction: "サンプルを増やす",
+        portfolioCandidate: "はい"
+      }
+    ];
+
+    const fields = ["workDate", "category", "workSummary", "timeSpent", "result", "insight", "nextAction", "portfolioCandidate"];
+    let logs = loadLogs();
+
+    const categoryInput = document.querySelector("#category");
+    const rowsEl = document.querySelector("#logRows");
+    const summaryEl = document.querySelector("#summary");
+    const markdownEl = document.querySelector("#markdown");
+
+    function today() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function setupCategoryOptions() {
+      categoryInput.innerHTML = categories.map((category) => `<option>${category}</option>`).join("");
+    }
+
+    function loadLogs() {
+      try {
+        const saved = localStorage.getItem(storageKey);
+        return saved ? JSON.parse(saved) : sampleLogs.map((log) => ({ ...log }));
+      } catch (error) {
+        return sampleLogs.map((log) => ({ ...log }));
+      }
+    }
+
+    function saveLogs() {
+      localStorage.setItem(storageKey, JSON.stringify(logs));
+    }
+
+    function valueOf(id) {
+      return document.querySelector(`#${id}`).value.trim();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function addLog() {
+      const log = fields.reduce((acc, id) => {
+        acc[id] = valueOf(id) || "-";
+        return acc;
+      }, {});
+      logs.unshift(log);
+      saveLogs();
+      render();
+    }
+
+    function renderSummary() {
+      const totalTime = logs.reduce((sum, log) => sum + parseTime(log.timeSpent), 0);
+      const categoryCounts = categories
+        .map((category) => `<span>${category}: ${logs.filter((log) => log.category === category).length}</span>`)
+        .join("");
+      const candidates = logs.filter((log) => log.portfolioCandidate === "はい").length;
+      summaryEl.innerHTML = `${categoryCounts}<span>実績化候補: ${candidates}</span><span>合計時間: ${formatHours(totalTime)}</span>`;
+    }
+
+    function parseTime(value) {
+      const text = String(value).toLowerCase();
+      const hourMatch = text.match(/([0-9.]+)\s*h/);
+      const minuteMatch = text.match(/([0-9.]+)\s*m/);
+      if (hourMatch) return Number(hourMatch[1]);
+      if (minuteMatch) return Number(minuteMatch[1]) / 60;
+      const numeric = Number(text.replace(/[^0-9.]/g, ""));
+      return Number.isFinite(numeric) ? numeric : 0;
+    }
+
+    function formatHours(value) {
+      if (!value) return "0h";
+      return `${Math.round(value * 10) / 10}h`;
+    }
+
+    function renderRows() {
+      rowsEl.innerHTML = logs.map((log) => `
+        <tr>
+          <td>${escapeHtml(log.workDate)}</td>
+          <td>${escapeHtml(log.category)}</td>
+          <td>${escapeHtml(log.workSummary)}</td>
+          <td>${escapeHtml(log.timeSpent)}</td>
+          <td>${escapeHtml(log.result)}</td>
+          <td>${escapeHtml(log.insight)}</td>
+          <td>${escapeHtml(log.nextAction)}</td>
+          <td class="${log.portfolioCandidate === "はい" ? "candidate" : ""}">${escapeHtml(log.portfolioCandidate)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function buildMarkdown(logList = logs, candidatesOnly = false) {
+      const summary = categories
+        .map((category) => `- ${category}: ${logList.filter((log) => log.category === category).length}`)
+        .join("\n");
+
+      const rows = logList
+        .map((log) => `| ${log.workDate} | ${log.category} | ${log.workSummary} | ${log.timeSpent} | ${log.result} | ${log.portfolioCandidate} |`)
+        .join("\n") || "| - | - | - | - | - | - |";
+
+      const candidateList = logList
+        .filter((log) => log.portfolioCandidate === "はい")
+        .map((log) => `### ${log.workSummary}\n\n- 作業日: ${log.workDate}\n- カテゴリ: ${log.category}\n- 時間: ${log.timeSpent}\n- 成果: ${log.result}\n- 気づき: ${log.insight}\n- 次にやること: ${log.nextAction}`)
+        .join("\n\n") || "- なし";
+
+      return `# ${candidatesOnly ? "Portfolio Candidate Logs" : "Work Logs"}
+
+## Summary
+
+${summary}
+
+## Logs
+
+| 作業日 | カテゴリ | 作業内容 | 時間 | 成果 | 実績化候補 |
+| --- | --- | --- | --- | --- | --- |
+${rows}
+
+## Portfolio Candidates
+
+${candidateList}`;
+    }
+
+    function renderMarkdown() {
+      markdownEl.textContent = buildMarkdown();
+    }
+
+    function render() {
+      renderSummary();
+      renderRows();
+      renderMarkdown();
+    }
+
+    function resetSamples() {
+      logs = sampleLogs.map((log) => ({ ...log }));
+      saveLogs();
+      document.querySelector("#workDate").value = today();
+      document.querySelector("#category").value = sampleLogs[0].category;
+      document.querySelector("#workSummary").value = sampleLogs[0].workSummary;
+      document.querySelector("#timeSpent").value = sampleLogs[0].timeSpent;
+      document.querySelector("#result").value = sampleLogs[0].result;
+      document.querySelector("#insight").value = sampleLogs[0].insight;
+      document.querySelector("#nextAction").value = sampleLogs[0].nextAction;
+      document.querySelector("#portfolioCandidate").value = sampleLogs[0].portfolioCandidate;
+      render();
+    }
+
+    async function copyText(text, button) {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const buffer = document.createElement("textarea");
+        buffer.value = text;
+        buffer.setAttribute("readonly", "");
+        buffer.style.position = "fixed";
+        buffer.style.opacity = "0";
+        document.body.appendChild(buffer);
+        buffer.select();
+        document.execCommand("copy");
+        document.body.removeChild(buffer);
+      }
+      const original = button.textContent;
+      button.textContent = "コピーしました";
+      setTimeout(() => {
+        button.textContent = original;
+      }, 1200);
+    }
+
+    setupCategoryOptions();
+    document.querySelector("#workDate").value = today();
+    document.querySelector("#addLog").addEventListener("click", addLog);
+    document.querySelector("#resetSamples").addEventListener("click", resetSamples);
+    document.querySelector("#copyAll").addEventListener("click", (event) => copyText(buildMarkdown(), event.target));
+    document.querySelector("#copyCandidates").addEventListener("click", (event) => {
+      const candidates = logs.filter((log) => log.portfolioCandidate === "はい");
+      copyText(buildMarkdown(candidates, true), event.target);
+    });
+    render();
+  </script>
+</body>
+</html>

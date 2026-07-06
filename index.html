@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Retirement OS</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d9dee7;
+      --accent: #0f766e;
+      --accent-ink: #ffffff;
+      --soft: #e6f4f1;
+      --shadow: 0 14px 32px rgba(24, 34, 48, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    header {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: var(--soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin: 24px 0;
+    }
+
+    .flow span {
+      min-height: 54px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 800;
+      text-align: center;
+      padding: 8px;
+    }
+
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .tool {
+      display: grid;
+      gap: 12px;
+      min-height: 220px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .tool:hover,
+    .tool:focus-visible {
+      border-color: var(--accent);
+      outline: 3px solid rgba(15, 118, 110, 0.16);
+      outline-offset: 0;
+    }
+
+    .tool h2 {
+      margin: 0;
+      font-size: 21px;
+      letter-spacing: 0;
+    }
+
+    .tool p {
+      color: var(--muted);
+    }
+
+    .tool strong {
+      color: var(--accent);
+      font-size: 13px;
+    }
+
+    .tool .open {
+      width: fit-content;
+      margin-top: auto;
+      border-radius: 6px;
+      padding: 9px 12px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .note {
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .flow,
+      .tools {
+        grid-template-columns: 1fr;
+      }
+
+      .tool {
+        min-height: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <span class="badge">Retirement OS Launcher</span>
+      <h1>引退OS</h1>
+      <p>案件選別、応募文作成、案件管理、作業記録、実績化までをブラウザだけで回す実用ツール集です。</p>
+    </header>
+
+    <section class="flow" aria-label="利用の流れ">
+      <span>1. 案件を選ぶ</span>
+      <span>2. 応募文を書く</span>
+      <span>3. 案件を管理</span>
+      <span>4. 作業を記録</span>
+      <span>5. 実績化する</span>
+    </section>
+
+    <section class="tools" aria-label="ツール一覧">
+      <a class="tool" href="tools/opportunity-scorecard/index.html">
+        <strong>1. 案件選別</strong>
+        <h2>Opportunity Scorecard</h2>
+        <p>案件や企画を採点し、応募 / 保留 / 見送りを判断します。</p>
+        <span class="open">開く</span>
+      </a>
+
+      <a class="tool" href="tools/proposal-draft-builder/index.html">
+        <strong>2. 応募効率化</strong>
+        <h2>Proposal Draft Builder</h2>
+        <p>応募すると決めた案件から、クラウドワークス等に使える応募文を作ります。</p>
+        <span class="open">開く</span>
+      </a>
+
+      <a class="tool" href="tools/client-crm/index.html">
+        <strong>3. 案件管理</strong>
+        <h2>Client CRM</h2>
+        <p>応募・受注案件、ステータス、報酬、次アクションを管理します。</p>
+        <span class="open">開く</span>
+      </a>
+
+      <a class="tool" href="tools/work-log-builder/index.html">
+        <strong>4. 作業記録</strong>
+        <h2>Work Log Builder</h2>
+        <p>日々の作業内容、成果、気づきを記録し、実績化候補を抽出します。</p>
+        <span class="open">開く</span>
+      </a>
+
+      <a class="tool" href="tools/portfolio-case-builder/index.html">
+        <strong>5. ポートフォリオ化</strong>
+        <h2>Portfolio Case Builder</h2>
+        <p>完了した案件や制作物を、ポートフォリオ用の実績紹介文に変換します。</p>
+        <span class="open">開く</span>
+      </a>
+    </section>
+
+    <p class="note">すべてHTML単体で動作します。外部APIやログインは不要です。公開前に、実名・契約情報・個人情報を含めないよう確認してください。</p>
+  </main>
+</body>
+</html>

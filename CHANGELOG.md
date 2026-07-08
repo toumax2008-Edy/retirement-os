@@ -98,4 +98,14 @@
 
 - ルート `index.html` から Website Improvement Analyzer を開けるように更新。
 - `docs/showcase.md` に Website Improvement Analyzer を追加。
+## 2026-07-08 - Development #009
+
+### Changed
+
+- Website Improvement Analyzer を v1.1 に更新。
+- 強みと改善点のバランスを取った出力へ改善。
+- 優先順位に理由を付けて出力できるように変更。
+- 今すぐ改善できることと中長期で改善することを分けて出力。
+- 提案書のたたき台を、営業で渡しやすい自然な文章へ改善。
+- README と examples を v1.1 に合わせて更新。
 

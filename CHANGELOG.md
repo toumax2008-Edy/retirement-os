@@ -85,4 +85,17 @@
 ### Changed
 
 - ルート README と showcase に Launcher を反映。
+## 2026-07-08 - Development #008
+
+### Added
+
+- `tools/website-improvement-analyzer/` を追加。
+- v1.0 手動入力版として、Webサイト改善診断レポート生成ツールを追加。
+- README とサンプル分析レポートを追加。
+- ブラウザ内保存、Markdown出力、ワンクリックコピーを追加。
+
+### Changed
+
+- ルート `index.html` から Website Improvement Analyzer を開けるように更新。
+- `docs/showcase.md` に Website Improvement Analyzer を追加。
 

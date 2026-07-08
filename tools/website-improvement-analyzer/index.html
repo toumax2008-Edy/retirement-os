@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Website Improvement Analyzer</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d9dee7;
+      --accent: #0f766e;
+      --accent-ink: #ffffff;
+      --soft: #e6f4f1;
+      --warn: #b45309;
+      --shadow: 0 14px 32px rgba(24, 34, 48, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    main {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    header {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+      color: #344054;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: var(--ink);
+      background: #fff;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    textarea.large {
+      min-height: 116px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: var(--soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: var(--accent-ink);
+      background: var(--accent);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      color: var(--ink);
+      background: #eef2f7;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    pre {
+      min-height: 720px;
+      max-height: 860px;
+      overflow: auto;
+      margin: 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #101828;
+      color: #eef2ff;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 960px) {
+      .layout,
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+
+      pre {
+        min-height: 420px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <span class="badge">Website Improvement Analyzer v1.0</span>
+      <h1>サイト改善診断から提案書のたたき台を作る</h1>
+      <p>企業サイト、LP、ECサイトを見ながら気づきを入力し、営業提案に使えるMarkdownレポートへ整理します。</p>
+    </header>
+
+    <div class="layout">
+      <section aria-labelledby="input-title">
+        <h2 id="input-title">入力</h2>
+        <div id="fields"></div>
+        <div class="actions">
+          <button id="copy">Markdown をコピー</button>
+          <button id="reset" class="secondary">サンプルに戻す</button>
+          <span class="hint">ブラウザ内に自動保存します。APIキーや外部APIは使いません。</span>
+        </div>
+      </section>
+
+      <section aria-labelledby="output-title">
+        <h2 id="output-title">Markdown出力</h2>
+        <pre id="output"></pre>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const storageKey = "retirement-os-website-improvement-analyzer";
+
+    const fields = [
+      { id: "siteName", label: "サイト名", type: "input", value: "サンプル整体院 LP" },
+      { id: "url", label: "URL", type: "input", value: "https://example.com/sample-lp" },
+      { id: "industry", label: "業種", type: "input", value: "整体 / 予約サービス" },
+      { id: "siteType", label: "サイト種別", type: "select", options: ["ホームページ", "LP", "EC", "その他"], value: "LP" },
+      { id: "target", label: "ターゲット", type: "textarea", value: "肩こりや腰痛に悩む30代から50代の地域住民" },
+      { id: "firstImpression", label: "第一印象", type: "textarea", value: "店舗の雰囲気は伝わるが、初回訪問者がすぐ予約するには少し決め手が弱い。" },
+      { id: "goodPoints", label: "良い点", type: "textarea large", value: "ファーストビューで整体院の雰囲気が伝わる。料金と施術内容がまとまっている。予約ボタンがページ内に複数ある。" },
+      { id: "improvements", label: "改善点", type: "textarea large", value: "どの症状に強い整体院なのかが少し分かりにくい。予約ボタンの文言が弱く、押した後の流れが見えにくい。スマホ表示では重要情報が下に流れやすい。" },
+      { id: "design", label: "デザイン", type: "textarea", value: "清潔感はあるが、見出しとCTAの強弱をつけると行動につながりやすい。" },
+      { id: "clarity", label: "情報の分かりやすさ", type: "textarea", value: "料金、施術内容、予約方法はあるが、初めての人向けの流れを上部にまとめたい。" },
+      { id: "cta", label: "問い合わせ導線", type: "textarea", value: "予約ボタンはあるが、文言を「初回相談を予約する」など具体的にしたい。" },
+      { id: "mobile", label: "スマホ対応", type: "textarea", value: "スマホでは料金や予約導線までスクロールが必要。重要情報を上部に近づけたい。" },
+      { id: "speed", label: "表示速度", type: "textarea", value: "画像が多い場合は圧縮と読み込み順の見直しを検討したい。" },
+      { id: "seo", label: "SEOの気づき", type: "textarea", value: "地域名、症状名、整体院名を見出しや説明文に自然に入れる余地がある。" },
+      { id: "aiIdeas", label: "AIで改善できそうな点", type: "textarea large", value: "症状別の説明文、よくある質問、予約ボタン周辺の文言、初回向けの不安解消コピーをAIで複数案作成できる。" },
+      { id: "priority", label: "優先順位", type: "select", options: ["高", "中", "低"], value: "高" },
+      { id: "memo", label: "メモ", type: "textarea", value: "まずはファーストビュー、CTA、スマホ表示の順に改善提案する。" }
+    ];
+
+    const fieldsEl = document.querySelector("#fields");
+    const outputEl = document.querySelector("#output");
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function createFields() {
+      const saved = loadState();
+      fieldsEl.innerHTML = fields.map((field) => {
+        const value = saved[field.id] ?? field.value;
+        let control = "";
+        if (field.type === "select") {
+          const options = field.options.map((option) => `<option ${option === value ? "selected" : ""}>${option}</option>`).join("");
+          control = `<select id="${field.id}">${options}</select>`;
+        } else if (field.type === "input") {
+          control = `<input id="${field.id}" value="${escapeHtml(value)}" autocomplete="off">`;
+        } else {
+          const className = field.type.includes("large") ? "large" : "";
+          control = `<textarea id="${field.id}" class="${className}">${escapeHtml(value)}</textarea>`;
+        }
+        return `<label>${field.label}${control}</label>`;
+      }).join("");
+    }
+
+    function loadState() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey)) || {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveState(data) {
+      localStorage.setItem(storageKey, JSON.stringify(data));
+    }
+
+    function collectInput() {
+      return fields.reduce((acc, field) => {
+        acc[field.id] = document.querySelector(`#${field.id}`).value.trim();
+        return acc;
+      }, {});
+    }
+
+    function value(data, id) {
+      return data[id] || "-";
+    }
+
+    function buildNextActions(data) {
+      const actions = [];
+      if (value(data, "priority") === "高") actions.push("高優先度の改善点を3つに絞り、先に提案する。");
+      actions.push("ファーストビュー、CTA、スマホ表示の順に改善案を整理する。");
+      actions.push("AIで改善できる文章やFAQを複数案作り、提案書に添える。");
+      return actions.map((action, index) => `${index + 1}. ${action}`).join("\n");
+    }
+
+    function buildProposalDraft(data) {
+      return `${value(data, "siteName")}を拝見しました。全体として${value(data, "firstImpression")}
+
+特に改善余地が大きいのは、${value(data, "improvements")}という点です。
+
+まずは優先順位「${value(data, "priority")}」として、問い合わせ導線、スマホ表示、情報整理を中心に改善すると、訪問者が次の行動に進みやすくなると考えます。
+
+AIを活用すれば、${value(data, "aiIdeas")}ため、短期間で複数案を比較しながら改善できます。
+
+初回の対応として、現状ページの改善ポイントを整理し、優先度つきの改善案と修正文案を提出する形でご提案できます。`;
+    }
+
+    function buildMarkdown(data) {
+      return `# サイト改善診断レポート
+
+## サイト概要
+
+- サイト名: ${value(data, "siteName")}
+- URL: ${value(data, "url")}
+- 業種: ${value(data, "industry")}
+- サイト種別: ${value(data, "siteType")}
+- ターゲット: ${value(data, "target")}
+
+## 良い点
+
+${value(data, "goodPoints")}
+
+## 改善点
+
+${value(data, "improvements")}
+
+## 診断メモ
+
+- 第一印象: ${value(data, "firstImpression")}
+- デザイン: ${value(data, "design")}
+- 情報の分かりやすさ: ${value(data, "clarity")}
+- 問い合わせ導線: ${value(data, "cta")}
+- スマホ対応: ${value(data, "mobile")}
+- 表示速度: ${value(data, "speed")}
+- SEOの気づき: ${value(data, "seo")}
+
+## 優先順位
+
+${value(data, "priority")}
+
+## AI活用の提案
+
+${value(data, "aiIdeas")}
+
+## 次のアクション
+
+${buildNextActions(data)}
+
+## 提案書のたたき台
+
+${buildProposalDraft(data)}
+
+## Memo
+
+${value(data, "memo")}`;
+    }
+
+    function update() {
+      const data = collectInput();
+      saveState(data);
+      outputEl.textContent = buildMarkdown(data);
+    }
+
+    function resetForm() {
+      localStorage.removeItem(storageKey);
+      createFields();
+      update();
+    }
+
+    async function copyMarkdown() {
+      const text = outputEl.textContent;
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const buffer = document.createElement("textarea");
+        buffer.value = text;
+        buffer.setAttribute("readonly", "");
+        buffer.style.position = "fixed";
+        buffer.style.opacity = "0";
+        document.body.appendChild(buffer);
+        buffer.select();
+        document.execCommand("copy");
+        document.body.removeChild(buffer);
+      }
+      const button = document.querySelector("#copy");
+      button.textContent = "コピーしました";
+      setTimeout(() => {
+        button.textContent = "Markdown をコピー";
+      }, 1200);
+    }
+
+    createFields();
+    document.addEventListener("input", update);
+    document.querySelector("#copy").addEventListener("click", copyMarkdown);
+    document.querySelector("#reset").addEventListener("click", resetForm);
+    update();
+  </script>
+</body>
+</html>

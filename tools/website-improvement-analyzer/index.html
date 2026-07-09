@@ -175,9 +175,9 @@
 <body>
   <main>
     <header>
-      <span class="badge">Website Improvement Analyzer v1.1</span>
-      <h1>強みを活かして、改善提案を自然にまとめる</h1>
-      <p>企業サイト、LP、ECサイトの良い点と改善点を整理し、営業で渡しやすいMarkdown提案書を作ります。</p>
+      <span class="badge">Website Improvement Analyzer v1.5</span>
+      <h1>診断漏れを防ぎ、改善提案を自然にまとめる</h1>
+      <p>企業サイト、LP、ECサイトの良い点、改善点、チェックリストを整理し、営業で渡しやすいMarkdown提案書を作ります。</p>
     </header>
 
     <div class="layout">
@@ -199,7 +199,8 @@
   </main>
 
   <script>
-    const storageKey = "retirement-os-website-improvement-analyzer-v11";
+    const storageKey = "retirement-os-website-improvement-analyzer-v15";
+    const checklistOptions = ["OK", "要確認", "改善必要", "未確認"];
 
     const fields = [
       { id: "siteName", label: "サイト名", type: "input", value: "株式会社トータル・ハウスマネジメント" },
@@ -222,8 +223,44 @@
       { id: "speed", label: "表示速度", type: "textarea", value: "画像が多い場合は、画像圧縮と読み込み順の見直し余地がある。" },
       { id: "seo", label: "SEOの気づき", type: "textarea", value: "沖縄、賃貸管理、相続対策、借地相談、土地活用などの検索語を、見出しや説明文に自然に入れる余地がある。" },
       { id: "aiIdeas", label: "AIで改善できそうな点", type: "textarea large", value: "サービス別の説明文、FAQ、管理実績の紹介文、問い合わせ導線の文言を短時間で複数案作成できる。" },
+      { id: "seoTitle", label: "SEO: タイトルが分かりやすいか", type: "select", options: checklistOptions, value: "要確認" },
+      { id: "seoHeadings", label: "SEO: 見出しが整理されているか", type: "select", options: checklistOptions, value: "改善必要" },
+      { id: "seoKeywords", label: "SEO: 検索されそうな言葉が入っているか", type: "select", options: checklistOptions, value: "要確認" },
+      { id: "seoServices", label: "SEO: 事業内容・サービス内容が明確か", type: "select", options: checklistOptions, value: "OK" },
+      { id: "ctaButton", label: "CTA: 問い合わせボタンが分かりやすいか", type: "select", options: checklistOptions, value: "改善必要" },
+      { id: "ctaAction", label: "CTA: 次に取ってほしい行動が明確か", type: "select", options: checklistOptions, value: "改善必要" },
+      { id: "ctaWords", label: "CTA: ボタン文言が具体的か", type: "select", options: checklistOptions, value: "要確認" },
+      { id: "ctaRepeat", label: "CTA: ページ内に複数あるか", type: "select", options: checklistOptions, value: "要確認" },
+      { id: "mobileText", label: "スマホ: 文字が読みやすいか", type: "select", options: checklistOptions, value: "要確認" },
+      { id: "mobileButton", label: "スマホ: ボタンが押しやすいか", type: "select", options: checklistOptions, value: "要確認" },
+      { id: "mobileSpacing", label: "スマホ: 画像や文章が詰まりすぎていないか", type: "select", options: checklistOptions, value: "要確認" },
+      { id: "mobileImportant", label: "スマホ: 重要情報がすぐ分かるか", type: "select", options: checklistOptions, value: "改善必要" },
+      { id: "fvSite", label: "ファーストビュー: 何のサイトか分かるか", type: "select", options: checklistOptions, value: "要確認" },
+      { id: "fvTarget", label: "ファーストビュー: 誰向けか分かるか", type: "select", options: checklistOptions, value: "改善必要" },
+      { id: "fvStrength", label: "ファーストビュー: 強みや特徴が伝わるか", type: "select", options: checklistOptions, value: "改善必要" },
+      { id: "fvCta", label: "ファーストビュー: 導線が見えるか", type: "select", options: checklistOptions, value: "改善必要" },
+      { id: "trustCases", label: "信頼材料: 実績・事例・お客様の声があるか", type: "select", options: checklistOptions, value: "OK" },
+      { id: "trustCompany", label: "信頼材料: 会社情報・店舗情報が分かるか", type: "select", options: checklistOptions, value: "OK" },
+      { id: "trustPrice", label: "信頼材料: 料金やサービス内容が分かりやすいか", type: "select", options: checklistOptions, value: "要確認" },
+      { id: "trustAnxiety", label: "信頼材料: 不安を減らす説明があるか", type: "select", options: checklistOptions, value: "要確認" },
+      { id: "speedHeavy", label: "表示速度: 表示が重く感じるか", type: "select", options: checklistOptions, value: "未確認" },
+      { id: "speedImages", label: "表示速度: 画像が多すぎないか", type: "select", options: checklistOptions, value: "未確認" },
+      { id: "speedFirstView", label: "表示速度: ファーストビューの読み込みが遅くないか", type: "select", options: checklistOptions, value: "未確認" },
+      { id: "speedMemo", label: "表示速度メモ", type: "textarea", value: "体感で重い場合は、画像圧縮、不要画像の削減、ファーストビュー画像の見直しから確認する。" },
+      { id: "topPriority", label: "最優先で直すべき点", type: "textarea", value: "ファーストビューの見出しと問い合わせ導線を整理する。" },
+      { id: "nextPriority", label: "次に直すべき点", type: "textarea", value: "サービス別の説明と相談導線を分ける。" },
+      { id: "laterPriority", label: "余裕があれば直す点", type: "textarea", value: "FAQ、事例紹介、地域SEO向けの説明文を追加する。" },
       { id: "tone", label: "提案トーン", type: "select", options: ["やわらかい", "標準", "営業向け"], value: "やわらかい" },
       { id: "memo", label: "メモ", type: "textarea", value: "否定ではなく、今ある信頼材料を問い合わせにつながる形に整理する提案として伝える。" }
+    ];
+
+    const checklistGroups = [
+      { title: "SEOチェック", items: [["seoTitle", "タイトルが分かりやすいか"], ["seoHeadings", "見出しが整理されているか"], ["seoKeywords", "検索されそうな言葉が入っているか"], ["seoServices", "事業内容・サービス内容が明確か"]] },
+      { title: "CTAチェック", items: [["ctaButton", "問い合わせボタンが分かりやすいか"], ["ctaAction", "次に取ってほしい行動が明確か"], ["ctaWords", "ボタン文言が具体的か"], ["ctaRepeat", "CTAがページ内に複数あるか"]] },
+      { title: "スマホ対応チェック", items: [["mobileText", "スマホで文字が読みやすいか"], ["mobileButton", "ボタンが押しやすいか"], ["mobileSpacing", "画像や文章が詰まりすぎていないか"], ["mobileImportant", "重要情報がすぐ分かるか"]] },
+      { title: "ファーストビューチェック", items: [["fvSite", "最初の画面で何のサイトか分かるか"], ["fvTarget", "誰向けのサービスか分かるか"], ["fvStrength", "強みや特徴が伝わるか"], ["fvCta", "問い合わせ・購入などの導線が見えるか"]] },
+      { title: "信頼材料チェック", items: [["trustCases", "実績・事例・お客様の声があるか"], ["trustCompany", "会社情報・店舗情報が分かるか"], ["trustPrice", "料金やサービス内容が分かりやすいか"], ["trustAnxiety", "不安を減らす説明があるか"]] },
+      { title: "表示速度チェック", items: [["speedHeavy", "表示が重く感じるか"], ["speedImages", "画像が多すぎないか"], ["speedFirstView", "ファーストビューの読み込みが遅くないか"]] }
     ];
 
     const fieldsEl = document.querySelector("#fields");
@@ -287,6 +324,47 @@
         .join("\n") || "- -";
     }
 
+    function buildChecklistMarkdown(data) {
+      return checklistGroups.map((group) => {
+        const rows = group.items.map(([id, label]) => `- ${label}: ${value(data, id)}`).join("\n");
+        return `### ${group.title}\n\n${rows}`;
+      }).join("\n\n");
+    }
+
+    function buildChecklistSummary(data) {
+      const needs = [];
+      const watch = [];
+      checklistGroups.forEach((group) => {
+        group.items.forEach(([id, label]) => {
+          if (data[id] === "改善必要") {
+            needs.push(`${group.title}: ${label}`);
+          }
+          if (data[id] === "要確認") {
+            watch.push(`${group.title}: ${label}`);
+          }
+        });
+      });
+      return {
+        needs: needs.slice(0, 5),
+        watch: watch.slice(0, 5)
+      };
+    }
+
+    function buildPriorityMarkdown(data) {
+      const summary = buildChecklistSummary(data);
+      const needsText = summary.needs.length ? summary.needs.map((item) => `- ${item}`).join("\n") : "- 大きな改善必要項目は未入力です。";
+      const watchText = summary.watch.length ? summary.watch.map((item) => `- ${item}`).join("\n") : "- 要確認項目は未入力です。";
+      return `### 最優先で直すべき点\n\n${bulletLines(value(data, "topPriority"))}\n\nチェック上の改善必要項目:\n${needsText}\n\n### 次に直すべき点\n\n${bulletLines(value(data, "nextPriority"))}\n\nチェック上の要確認項目:\n${watchText}\n\n### 余裕があれば直す点\n\n${bulletLines(value(data, "laterPriority"))}`;
+    }
+
+    function trimSentenceEnd(text) {
+      return String(text || "-").replace(/[。.!！?？]+$/g, "");
+    }
+
+    function buildShortProposal(data) {
+      return `${value(data, "siteName")}は、サイト全体として信頼材料や基本情報は掲載されています。一方で、${trimSentenceEnd(value(data, "topPriority"))}ことで、初めて訪問した人が次の行動を取りやすくなります。まずはこの部分から着手し、次に${trimSentenceEnd(value(data, "nextPriority"))}流れにすると、営業・問い合わせ面で効果が出やすいです。`;
+    }
+
     function buildProposalDraft(data) {
       const opening = value(data, "tone") === "やわらかい"
         ? `${value(data, "siteName")}のサイトを拝見しました。現在のサイトには、会社の実在感や対応業務の幅が伝わる良い材料がすでにあります。`
@@ -298,7 +376,13 @@
 
 一方で、初めて訪問した方が「自分は何を相談できるのか」「次に何をすればよいのか」をすぐ判断できるようにすると、問い合わせにつながりやすくなると考えます。
 
-まずは、${value(data, "quickWins")}ところから着手するのがおすすめです。
+チェックリスト上でも、ファーストビュー、CTA、スマホでの重要情報の見え方は優先して確認したい項目です。
+
+まずは、${trimSentenceEnd(value(data, "topPriority"))}ことから着手するのがおすすめです。具体的には、次の内容を先に整えると改善効果を確認しやすくなります。
+
+${bulletLines(value(data, "quickWins"))}
+
+次に、${trimSentenceEnd(value(data, "nextPriority"))}ことを進めると、サイトを見た人が相談内容を選びやすくなります。
 
 中長期では、${value(data, "longTerm")}ことで、検索流入や相談前の安心感も高められます。
 
@@ -339,6 +423,14 @@ ${bulletLines(value(data, "improvements"))}
 - 優先度: ${value(data, "priority")}
 - 理由: ${value(data, "priorityReason")}
 
+## 診断チェックリスト
+
+${buildChecklistMarkdown(data)}
+
+## 改善優先度
+
+${buildPriorityMarkdown(data)}
+
 ## 今すぐ改善できること
 
 ${bulletLines(value(data, "quickWins"))}
@@ -354,13 +446,18 @@ ${bulletLines(value(data, "longTerm"))}
 - 問い合わせ導線: ${value(data, "cta")}
 - スマホ対応: ${value(data, "mobile")}
 - 表示速度: ${value(data, "speed")}
+- 表示速度メモ: ${value(data, "speedMemo")}
 - SEOの気づき: ${value(data, "seo")}
 
 ## AI活用の提案
 
 ${bulletLines(value(data, "aiIdeas"))}
 
-## 提案書のたたき台
+## 提案書の短い版
+
+${buildShortProposal(data)}
+
+## 提案書の詳しい版
 
 ${buildProposalDraft(data)}
 
@@ -405,6 +502,7 @@ ${value(data, "memo")}`;
 
     createFields();
     document.addEventListener("input", update);
+    document.addEventListener("change", update);
     document.querySelector("#copy").addEventListener("click", copyMarkdown);
     document.querySelector("#reset").addEventListener("click", resetForm);
     update();

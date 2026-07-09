@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Website Fix Plan Builder</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d9dee7;
+      --accent: #0f766e;
+      --accent-ink: #ffffff;
+      --soft: #e6f4f1;
+      --shadow: 0 14px 32px rgba(24, 34, 48, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    main {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    header {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(340px, 0.95fr) minmax(0, 1.05fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    section,
+    fieldset {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    section {
+      padding: 20px;
+    }
+
+    fieldset {
+      display: grid;
+      gap: 10px;
+      margin: 0 0 14px;
+      padding: 16px;
+    }
+
+    legend,
+    h2 {
+      color: var(--ink);
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+
+    legend {
+      padding: 0 6px;
+      font-size: 15px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: #344054;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: var(--ink);
+      background: #fff;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    textarea.large {
+      min-height: 132px;
+    }
+
+    .checks {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 12px;
+    }
+
+    .check {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-weight: 700;
+    }
+
+    .check input {
+      width: auto;
+      margin-top: 5px;
+    }
+
+    .badge {
+      display: inline-flex;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: var(--soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: var(--accent-ink);
+      background: var(--accent);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      color: var(--ink);
+      background: #eef2f7;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    pre {
+      min-height: 760px;
+      max-height: 900px;
+      overflow: auto;
+      margin: 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #101828;
+      color: #eef2ff;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 980px) {
+      .layout,
+      .checks {
+        grid-template-columns: 1fr;
+      }
+
+      pre {
+        min-height: 420px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <span class="badge">Website Fix Plan Builder MVP</span>
+      <h1>診断結果を、改善作業・納品物・見積もり目安へ変換する</h1>
+      <p>Website Improvement Analyzer の診断内容を貼り付け、サイト改善ミニ支援として実行できる計画書をMarkdownで作ります。</p>
+    </header>
+
+    <div class="layout">
+      <section aria-labelledby="input-title">
+        <h2 id="input-title">入力</h2>
+
+        <fieldset>
+          <legend>基本情報</legend>
+          <label>サイト名<input id="siteName" autocomplete="off"></label>
+          <label>URL<input id="url" autocomplete="off"></label>
+          <label>業種<input id="industry" autocomplete="off"></label>
+          <label>クライアント種別
+            <select id="clientType">
+              <option>知人・友人</option>
+              <option>地元事業者</option>
+              <option>クラウドワークス案件</option>
+              <option>参考サイト</option>
+            </select>
+          </label>
+          <label>診断日<input id="diagnosisDate" type="date"></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>診断結果貼り付け</legend>
+          <label>最優先で直す点<textarea id="topPriority"></textarea></label>
+          <label>次に直す点<textarea id="nextPriority"></textarea></label>
+          <label>余裕があれば直す点<textarea id="laterPriority"></textarea></label>
+          <label>短い提案文<textarea id="shortProposal" class="large"></textarea></label>
+          <label>詳しい提案文<textarea id="detailedProposal" class="large"></textarea></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>改善メニュー</legend>
+          <label>選択メニュー
+            <select id="menu">
+              <option>無料簡易診断</option>
+              <option>ミニ改善案作成</option>
+              <option>修正指示書作成</option>
+              <option>文章・CTA改善パック</option>
+              <option>Canva画像/バナー改善パック</option>
+              <option>実装サポート相談</option>
+            </select>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>対応範囲</legend>
+          <div id="scopeChecks" class="checks"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>作業条件</legend>
+          <label>想定納期<input id="deadline" autocomplete="off"></label>
+          <label>想定工数<input id="workload" autocomplete="off"></label>
+          <label>見積もりメモ<textarea id="estimateMemo"></textarea></label>
+          <label>自分で対応する作業<textarea id="ownTasks"></textarea></label>
+          <label>クライアント側にお願いする作業<textarea id="clientTasks"></textarea></label>
+          <label>外注または専門業者に任せる作業<textarea id="specialistTasks"></textarea></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>クライアント確認事項</legend>
+          <div id="confirmChecks" class="checks"></div>
+          <label>追加確認メモ<textarea id="confirmMemo"></textarea></label>
+        </fieldset>
+
+        <div class="actions">
+          <button id="generate" class="secondary">Markdown を生成</button>
+          <button id="copy">Markdown をコピー</button>
+          <button id="reset" class="secondary">サンプルに戻す</button>
+          <span class="hint">ブラウザ内に自動保存します。APIキーや外部APIは使いません。</span>
+        </div>
+      </section>
+
+      <section aria-labelledby="output-title">
+        <h2 id="output-title">Markdown出力</h2>
+        <pre id="output"></pre>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const storageKey = "retirement-os-website-fix-plan-builder-mvp";
+    const scopeOptions = ["キャッチコピー改善", "サービス説明文改善", "CTA文言改善", "問い合わせ導線整理", "ファーストビュー構成案", "信頼材料の整理", "FAQ作成", "Canva画像/バナー案", "修正指示書作成", "WordPress等への反映補助", "専門業者へ渡す指示書作成"];
+    const confirmOptions = ["サイトの編集権限は誰が持っているか", "WordPressなどの管理画面に入れるか", "問い合わせ導線は電話/LINE/フォームのどれを優先するか", "掲載できる実績やお客様の声はあるか", "画像素材はあるか", "料金やサービス内容を公開してよいか", "修正反映まで希望するか、指示書だけでよいか"];
+
+    const menuDetails = {
+      "無料簡易診断": { price: "0円", deliverables: ["簡易診断メモ", "改善候補3点", "次の提案"], note: "信頼づくりと有料支援への入口にする。" },
+      "ミニ改善案作成": { price: "3,000〜5,000円", deliverables: ["ファーストビュー改善案", "CTA文言案", "サービス説明の改善案", "改善優先度メモ"], note: "小さく試せる改善提案として出す。" },
+      "修正指示書作成": { price: "10,000円前後", deliverables: ["修正箇所一覧", "修正前後の文章案", "優先順位", "確認事項"], note: "Web担当者や制作会社に渡せる形にする。" },
+      "文章・CTA改善パック": { price: "15,000〜30,000円", deliverables: ["キャッチコピー案", "サービス説明文", "CTA文言案", "FAQ案", "掲載順の提案"], note: "文章と導線をまとめて整える。" },
+      "Canva画像/バナー改善パック": { price: "15,000〜30,000円", deliverables: ["Canvaバナー案", "画像差し替え案", "簡易図解案", "掲載位置メモ"], note: "見た目の印象を低コストで改善する。" },
+      "実装サポート相談": { price: "別途相談", deliverables: ["修正案", "実装メモ", "作業ログ", "専門業者へ渡す相談メモ"], note: "HTMLの軽微な修正や既存ページへの文章反映に絞る。" }
+    };
+
+    const defaults = {
+      siteName: "株式会社トータル・ハウスマネジメント",
+      url: "https://www.totalhouse-mgt.jp/",
+      industry: "不動産管理 / 不動産コンサルティング",
+      clientType: "参考サイト",
+      diagnosisDate: new Date().toISOString().slice(0, 10),
+      topPriority: "ファーストビューの見出しと問い合わせ導線を整理する。",
+      nextPriority: "サービス別の説明と相談導線を分ける。",
+      laterPriority: "FAQ、事例紹介、地域SEO向けの説明文を追加する。",
+      shortProposal: "信頼材料は掲載されていますが、最初に見た人が何を相談できるかをすぐ判断できるようにすると、問い合わせにつながりやすくなります。",
+      detailedProposal: "今ある会社情報や実績を活かしながら、ファーストビュー、CTA、サービス説明、FAQを順番に整える改善案です。大規模な作り替えではなく、問い合わせにつながる見せ方へ整理します。",
+      menu: "ミニ改善案作成",
+      deadline: "3〜5営業日",
+      workload: "2〜4時間",
+      estimateMemo: "まずはミニ改善案として提案し、修正指示書や文章改善が必要な場合は追加提案にする。",
+      ownTasks: "改善優先度の整理、キャッチコピー案、CTA文言案、修正指示書の作成。",
+      clientTasks: "編集権限、掲載できる実績、優先したい問い合わせ方法、画像素材の確認。",
+      specialistTasks: "サーバー移転、予約システム、決済機能、WordPressテーマの深い改修は専門業者へ相談。",
+      confirmMemo: "料金や実績を公開する場合は、必ず事前確認を取る。"
+    };
+
+    const defaultScopes = ["キャッチコピー改善", "サービス説明文改善", "CTA文言改善", "問い合わせ導線整理", "ファーストビュー構成案", "FAQ作成", "修正指示書作成"];
+    const defaultConfirms = ["サイトの編集権限は誰が持っているか", "問い合わせ導線は電話/LINE/フォームのどれを優先するか", "掲載できる実績やお客様の声はあるか", "画像素材はあるか", "料金やサービス内容を公開してよいか", "修正反映まで希望するか、指示書だけでよいか"];
+    const fieldIds = Object.keys(defaults);
+    const outputEl = document.querySelector("#output");
+
+    function escapeHtml(value) {
+      return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+    }
+
+    function loadState() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey)) || {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveState(data) {
+      localStorage.setItem(storageKey, JSON.stringify(data));
+    }
+
+    function createChecks(targetId, options, selected) {
+      document.querySelector(`#${targetId}`).innerHTML = options.map((item) => {
+        const checked = selected.includes(item) ? "checked" : "";
+        return `<label class="check"><input type="checkbox" value="${escapeHtml(item)}" ${checked}>${escapeHtml(item)}</label>`;
+      }).join("");
+    }
+
+    function createForm() {
+      const state = { ...defaults, ...loadState() };
+      fieldIds.forEach((id) => {
+        document.querySelector(`#${id}`).value = state[id] ?? "";
+      });
+      createChecks("scopeChecks", scopeOptions, state.scopes || defaultScopes);
+      createChecks("confirmChecks", confirmOptions, state.confirms || defaultConfirms);
+    }
+
+    function checkedValues(targetId) {
+      return [...document.querySelectorAll(`#${targetId} input:checked`)].map((input) => input.value);
+    }
+
+    function collectInput() {
+      const data = fieldIds.reduce((acc, id) => {
+        acc[id] = document.querySelector(`#${id}`).value.trim();
+        return acc;
+      }, {});
+      data.scopes = checkedValues("scopeChecks");
+      data.confirms = checkedValues("confirmChecks");
+      return data;
+    }
+
+    function value(data, id) {
+      return data[id] || "-";
+    }
+
+    function list(items, fallback = "- 未入力") {
+      const clean = items.filter(Boolean);
+      return clean.length ? clean.map((item) => `- ${item}`).join("\n") : fallback;
+    }
+
+    function bulletLines(text) {
+      return String(text || "-")
+        .split(/。|\n/)
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .map((item) => `- ${item}。`)
+        .join("\n") || "- 未入力";
+    }
+
+    function deliverables(data) {
+      const base = [...menuDetails[data.menu].deliverables];
+      const scopeMap = {
+        "キャッチコピー改善": "キャッチコピー案",
+        "サービス説明文改善": "サービス説明文",
+        "CTA文言改善": "CTA文言案",
+        "問い合わせ導線整理": "問い合わせ導線整理メモ",
+        "ファーストビュー構成案": "ファーストビュー改善案",
+        "信頼材料の整理": "信頼材料の整理案",
+        "FAQ作成": "FAQ案",
+        "Canva画像/バナー案": "Canvaバナー案",
+        "修正指示書作成": "修正指示書",
+        "WordPress等への反映補助": "反映作業メモ",
+        "専門業者へ渡す指示書作成": "専門業者へ渡す指示書"
+      };
+      data.scopes.forEach((scope) => {
+        if (scopeMap[scope]) {
+          base.push(scopeMap[scope]);
+        }
+      });
+      return [...new Set(base)];
+    }
+
+    function workSteps(data) {
+      const steps = [
+        "診断結果を確認し、最優先タスク、次にやるタスク、余裕があればやるタスクに分ける。",
+        "クライアント確認事項を送り、編集権限、素材、問い合わせ導線、公開可否を確認する。",
+        "対応範囲を確定し、受けない作業は専門業者への相談または対象外として明記する。",
+        "選択メニューに合わせて改善案、文章案、CTA案、FAQ案、修正指示書を作成する。",
+        "納品前に事実関係、掲載許可、個人情報や契約情報が含まれていないか確認する。",
+        "納品後、作業ログを残し、公開可能な範囲だけ実績化メモへ転記する。"
+      ];
+      if (data.scopes.includes("Canva画像/バナー案")) {
+        steps.splice(4, 0, "Canva画像やバナー案が必要な場合は、差し替え目的と掲載位置を整理して作成する。");
+      }
+      if (data.scopes.includes("WordPress等への反映補助")) {
+        steps.splice(5, 0, "反映補助を行う場合は、バックアップ、編集権限、反映範囲を確認してから軽微な修正に絞って対応する。");
+      }
+      return steps;
+    }
+
+    function buildClientQuestions(data) {
+      const questions = data.confirms.map((item) => `- ${item}について確認させてください。`);
+      if (data.confirmMemo) {
+        questions.push(`- 補足: ${data.confirmMemo}`);
+      }
+      return questions;
+    }
+
+    function buildMarkdown(data) {
+      const detail = menuDetails[data.menu];
+      const outputs = deliverables(data);
+      return `# Website Fix Plan
+
+## 基本情報
+
+- サイト名: ${value(data, "siteName")}
+- URL: ${value(data, "url")}
+- 業種: ${value(data, "industry")}
+- クライアント種別: ${value(data, "clientType")}
+- 診断日: ${value(data, "diagnosisDate")}
+
+## 選択メニュー
+
+- メニュー: ${value(data, "menu")}
+- 見積もり目安: ${detail.price}
+- メニューの位置づけ: ${detail.note}
+- 見積もりメモ: ${value(data, "estimateMemo")}
+
+## 改善作業リスト
+
+### 最優先タスク
+
+${bulletLines(value(data, "topPriority"))}
+
+### 次にやるタスク
+
+${bulletLines(value(data, "nextPriority"))}
+
+### 余裕があればやるタスク
+
+${bulletLines(value(data, "laterPriority"))}
+
+## 対応範囲
+
+${list(data.scopes)}
+
+## 納品物一覧
+
+${list(outputs)}
+
+## 作業条件
+
+- 想定納期: ${value(data, "deadline")}
+- 想定工数: ${value(data, "workload")}
+
+### 自分で対応する作業
+
+${bulletLines(value(data, "ownTasks"))}
+
+### クライアント側にお願いする作業
+
+${bulletLines(value(data, "clientTasks"))}
+
+### 外注または専門業者に任せる作業
+
+${bulletLines(value(data, "specialistTasks"))}
+
+## 作業手順
+
+${list(workSteps(data))}
+
+## 見積もり目安
+
+今回の選択メニューは「${value(data, "menu")}」です。Playbook上の目安は **${detail.price}** です。
+
+大規模リニューアル、サーバー移転、決済機能追加、予約システム構築、WordPressの深い技術改修、本格SEO運用、高度なアクセス解析、広告運用代行はこのMVPの対応範囲に含めません。
+
+## クライアント確認事項
+
+${list(buildClientQuestions(data))}
+
+## 診断提案文
+
+### 短い提案文
+
+${value(data, "shortProposal")}
+
+### 詳しい提案文
+
+${value(data, "detailedProposal")}
+
+## 作業ログ用Markdown
+
+### 作業名
+
+${value(data, "siteName")} サイト改善計画作成
+
+### 作業内容
+
+- Website Improvement Analyzer の診断結果をもとに改善計画を作成。
+- 改善メニュー「${value(data, "menu")}」を選択。
+- 対応範囲、納品物、見積もり目安、確認事項を整理。
+
+### 成果物
+
+${list(outputs)}
+
+### 次アクション
+
+- クライアント確認事項を送る。
+- 対応範囲と見積もりを確定する。
+- 必要に応じて Proposal Draft Builder で提案文を作る。
+
+## 実績化メモ
+
+- 課題: サイト診断で見つかった改善点を、実行できる作業と納品物に変換する必要があった。
+- 対応: ${value(data, "menu")}として、${data.scopes.join("、") || "対応範囲未入力"}を整理した。
+- 工夫: 大規模制作ではなく、小規模事業者向けのミニ改善支援として範囲を絞った。
+- 公開時の注意: 実名、URL、契約情報、個人情報、掲載許可が必要な実績は公開前に確認する。`;
+    }
+
+    function update() {
+      const data = collectInput();
+      saveState(data);
+      outputEl.textContent = buildMarkdown(data);
+    }
+
+    function resetForm() {
+      localStorage.removeItem(storageKey);
+      createForm();
+      update();
+    }
+
+    function fallbackCopy(text) {
+      const buffer = document.createElement("textarea");
+      buffer.value = text;
+      buffer.setAttribute("readonly", "");
+      buffer.style.position = "fixed";
+      buffer.style.opacity = "0";
+      document.body.appendChild(buffer);
+      buffer.select();
+      document.execCommand("copy");
+      document.body.removeChild(buffer);
+    }
+
+    async function copyMarkdown() {
+      const text = outputEl.textContent;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          fallbackCopy(text);
+        }
+      } catch (error) {
+        fallbackCopy(text);
+      }
+      const button = document.querySelector("#copy");
+      button.textContent = "コピーしました";
+      setTimeout(() => {
+        button.textContent = "Markdown をコピー";
+      }, 1200);
+    }
+
+    createForm();
+    document.addEventListener("input", update);
+    document.addEventListener("change", update);
+    document.querySelector("#generate").addEventListener("click", update);
+    document.querySelector("#copy").addEventListener("click", copyMarkdown);
+    document.querySelector("#reset").addEventListener("click", resetForm);
+    update();
+  </script>
+</body>
+</html>

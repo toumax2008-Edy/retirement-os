@@ -45,6 +45,8 @@ retirement-os/
 ## Tools
 
 - `tools/opportunity-scorecard/`: 案件や企画を採点し、応募 / 保留 / 見送りを判断する。
+- `tools/website-improvement-analyzer/`: 企業サイト、LP、ECサイトの改善点を診断し、提案書のたたき台を作る。
+- `tools/website-fix-plan-builder/`: サイト診断結果を改善作業、納品物、見積もり目安、確認事項へ変換する。
 - `tools/proposal-draft-builder/`: 応募と判断した案件の応募文下書きを作る。
 - `tools/client-crm/`: 応募・受注案件と次アクションを管理する。
 - `tools/work-log-builder/`: 日々の作業ログを記録し、実績化候補を抽出する。
@@ -67,4 +69,3 @@ retirement-os/
 - 外部 API や有料サービスへの依存は、必要性が明確になってから追加する。
 - 長期運用する資産は、最低限 `目的`, `使い方`, `入力`, `出力`, `今後の改善` を記録する。
 - 古くなったものは削除せず、理由を書いて `archive/` に移す。
-

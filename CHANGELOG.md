@@ -2,6 +2,19 @@
 
 このプロジェクトの主な変更を記録します。
 
+## 2026-07-09 - Development #013
+
+### Added
+
+- `tools/website-fix-plan-builder/` を追加。
+- Website Improvement Analyzer の診断結果を、改善作業、納品物、作業手順、見積もり目安、クライアント確認事項へ変換するMVPを追加。
+- 作業ログ用Markdownと実績化メモの生成に対応。
+- README とサンプル改善計画を追加。
+
+### Changed
+
+- Retirement OS Launcher に Website Fix Plan Builder を追加。
+- ルート README と showcase に Website Fix Plan Builder を反映。
 ## 2026-07-09 - Development #010
 
 ### Changed
@@ -118,4 +131,3 @@
 - 今すぐ改善できることと中長期で改善することを分けて出力。
 - 提案書のたたき台を、営業で渡しやすい自然な文章へ改善。
 - README と examples を v1.1 に合わせて更新。
-
